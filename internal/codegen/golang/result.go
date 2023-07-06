@@ -193,9 +193,9 @@ func buildQueries(req *plugin.CodeGenRequest, structs []Struct) ([]Query, error)
 
 		var constantName string
 		if req.Settings.Go.EmitExportedQueries {
-			constantName = sdk.Title(query.Name)
+			constantName = fmt.Sprintf("%s%s", sdk.Title(query.Name), sdk.Title(req.Settings.Engine))
 		} else {
-			constantName = sdk.LowerTitle(query.Name)
+			constantName = fmt.Sprintf("%s%s", sdk.LowerTitle(query.Name), sdk.Title(req.Settings.Engine))
 		}
 
 		gq := Query{

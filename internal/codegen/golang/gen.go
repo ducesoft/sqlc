@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"go/format"
+	"golang.org/x/tools/imports"
 	"strings"
 	"text/template"
 
@@ -26,6 +27,7 @@ type tmplCtx struct {
 
 	// TODO: Race conditions
 	SourceName string
+	Engine     string
 
 	EmitJSONTags              bool
 	JsonTagsIDUppercase       bool
@@ -181,19 +183,24 @@ func generate(req *plugin.CodeGenRequest, enums []Enum, structs []Struct, querie
 	output := map[string]string{}
 
 	execute := func(name, templateName string) error {
-		imports := i.Imports(name)
-		replacedQueries := replaceConflictedArg(imports, queries)
+		ipt := i.Imports(name)
+		replacedQueries := replaceConflictedArg(ipt, queries)
 
 		var b bytes.Buffer
 		w := bufio.NewWriter(&b)
 		tctx.SourceName = name
 		tctx.GoQueries = replacedQueries
+		tctx.Engine = sdk.Title(req.Settings.Engine)
 		err := tmpl.ExecuteTemplate(w, templateName, &tctx)
 		w.Flush()
 		if err != nil {
 			return err
 		}
-		code, err := format.Source(b.Bytes())
+		puff, err := imports.Process("", b.Bytes(), &imports.Options{Comments: true, TabIndent: true, TabWidth: 8, FormatOnly: false})
+		if nil != err {
+			return err
+		}
+		code, err := format.Source(puff)
 		if err != nil {
 			fmt.Println(b.String())
 			return fmt.Errorf("source error: %w", err)
@@ -202,7 +209,10 @@ func generate(req *plugin.CodeGenRequest, enums []Enum, structs []Struct, querie
 		if templateName == "queryFile" && golang.OutputFilesSuffix != "" {
 			name += golang.OutputFilesSuffix
 		}
-
+		if templateName == "queryFile" || templateName == "dbFile" {
+			name = strings.ReplaceAll(name, ".go", "")
+			name = fmt.Sprintf("%s.%s", strings.ReplaceAll(name, ".sql", ""), req.Settings.Engine)
+		}
 		if !strings.HasSuffix(name, ".go") {
 			name += ".go"
 		}

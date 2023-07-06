@@ -1,23 +1,18 @@
 {{define "dbCodeTemplateStd"}}
-type DBTX interface {
-	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
-	PrepareContext(context.Context, string) (*sql.Stmt, error)
-	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
-	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
-}
-
 {{ if .EmitMethodsWithDBArgument}}
-func New() *Queries {
+var _ DAL = (*{{.Engine}}Access)(nil)
+
+func New{{.Engine}}() *{{.Engine}}Access {
 	return &Queries{}
 {{- else -}}
-func New(db DBTX) *Queries {
-	return &Queries{db: db}
+func New{{.Engine}}(db DBTX) *{{.Engine}}Access {
+	return &{{.Engine}}Access{db: db}
 {{- end}}
 }
 
 {{if .EmitPreparedQueries}}
-func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
-	q := Queries{db: db}
+func Prepare{{.Engine}}(ctx context.Context, db DBTX) (*{{.Engine}}Access, error) {
+	q := {{.Engine}}Access{db: db}
 	var err error
 	{{- if eq (len .GoQueries) 0 }}
 	_ = err
@@ -30,7 +25,7 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	return &q, nil
 }
 
-func (q *Queries) Close() error {
+func (q *{{.Engine}}Access) Close() error {
 	var err error
 	{{- range .GoQueries }}
 	if q.{{.FieldName}} != nil {
@@ -42,7 +37,7 @@ func (q *Queries) Close() error {
 	return err
 }
 
-func (q *Queries) exec(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (sql.Result, error) {
+func (q *{{.Engine}}Access) exec(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (sql.Result, error) {
 	switch {
 	case stmt != nil && q.tx != nil:
 		return q.tx.StmtContext(ctx, stmt).ExecContext(ctx, args...)
@@ -53,7 +48,7 @@ func (q *Queries) exec(ctx context.Context, stmt *sql.Stmt, query string, args .
 	}
 }
 
-func (q *Queries) query(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (*sql.Rows, error) {
+func (q *{{.Engine}}Access) query(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (*sql.Rows, error) {
 	switch {
 	case stmt != nil && q.tx != nil:
 		return q.tx.StmtContext(ctx, stmt).QueryContext(ctx, args...)
@@ -64,7 +59,7 @@ func (q *Queries) query(ctx context.Context, stmt *sql.Stmt, query string, args 
 	}
 }
 
-func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (*sql.Row) {
+func (q *{{.Engine}}Access) queryRow(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (*sql.Row) {
 	switch {
 	case stmt != nil && q.tx != nil:
 		return q.tx.StmtContext(ctx, stmt).QueryRowContext(ctx, args...)
@@ -76,7 +71,7 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 {{end}}
 
-type Queries struct {
+type {{.Engine}}Access struct {
     {{- if not .EmitMethodsWithDBArgument}}
 	db DBTX
     {{- end}}
@@ -90,8 +85,8 @@ type Queries struct {
 }
 
 {{if not .EmitMethodsWithDBArgument}}
-func (q *Queries) WithTx(tx *sql.Tx) *Queries {
-	return &Queries{
+func (q *{{.Engine}}Access) WithTx(tx *sql.Tx) *{{.Engine}}Access {
+	return &{{.Engine}}Access{
 		db: tx,
      	{{- if .EmitPreparedQueries}}
 		tx: tx,

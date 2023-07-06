@@ -1,5 +1,13 @@
 {{define "interfaceCodeStd"}}
-    type Querier interface {
+    type DBTX interface {
+    	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
+    	PrepareContext(context.Context, string) (*sql.Stmt, error)
+    	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+    	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
+    }
+
+    type DAL interface {
+            io.Closer
     {{- $dbtxParam := .EmitMethodsWithDBArgument -}}
     {{- range .GoQueries}}
         {{- if and (eq .Cmd ":one") ($dbtxParam) }}
@@ -59,5 +67,20 @@
     {{- end}}
     }
 
-    var _ Querier = (*Queries)(nil)
+    {{- range .GoQueries}}
+    {{if .Arg.EmitStruct}}
+    type {{.Arg.Type}} struct { {{- range .Arg.UniqueFields}}
+      {{.Name}} {{.Type}} {{if .Tag}}{{$.Q}}{{.Tag}}{{$.Q}}{{end}}
+      {{- end}}
+    }
+    {{end}}
+
+    {{if .Ret.EmitStruct}}
+    type {{.Ret.Type}} struct { {{- range .Ret.Struct.Fields}}
+      {{.Name}} {{.Type}} {{if .Tag}}{{$.Q}}{{.Tag}}{{$.Q}}{{end}}
+      {{- end}}
+    }
+    {{end}}
+    {{- end}}
+
 {{end}}
