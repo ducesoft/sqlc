@@ -5,9 +5,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/kyleconroy/sqlc/internal/codegen/sdk"
-	"github.com/kyleconroy/sqlc/internal/debug"
-	"github.com/kyleconroy/sqlc/internal/plugin"
+	"github.com/ducesoft/sqlc/internal/codegen/sdk"
+	"github.com/ducesoft/sqlc/internal/debug"
+	"github.com/ducesoft/sqlc/internal/plugin"
 )
 
 func parseIdentifierString(name string) (*plugin.Identifier, error) {

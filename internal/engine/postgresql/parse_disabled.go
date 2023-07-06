@@ -8,8 +8,8 @@ import (
 	"io"
 	"runtime"
 
-	"github.com/kyleconroy/sqlc/internal/metadata"
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
+	"github.com/ducesoft/sqlc/internal/metadata"
+	"github.com/ducesoft/sqlc/internal/sql/ast"
 )
 
 func NewParser() *Parser {

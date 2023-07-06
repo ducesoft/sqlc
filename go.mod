@@ -1,4 +1,4 @@
-module github.com/kyleconroy/sqlc
+module github.com/ducesoft/sqlc
 
 go 1.20
 

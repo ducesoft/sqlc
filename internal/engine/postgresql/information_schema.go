@@ -3,8 +3,8 @@
 package postgresql
 
 import (
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
-	"github.com/kyleconroy/sqlc/internal/sql/catalog"
+	"github.com/ducesoft/sqlc/internal/sql/ast"
+	"github.com/ducesoft/sqlc/internal/sql/catalog"
 )
 
 var funcsgenInformationSchema = []*catalog.Function{}

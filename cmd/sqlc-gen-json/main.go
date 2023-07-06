@@ -7,8 +7,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/kyleconroy/sqlc/internal/codegen/json"
-	"github.com/kyleconroy/sqlc/internal/plugin"
+	"github.com/ducesoft/sqlc/internal/codegen/json"
+	"github.com/ducesoft/sqlc/internal/plugin"
 )
 
 func main() {

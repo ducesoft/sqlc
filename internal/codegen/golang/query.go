@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kyleconroy/sqlc/internal/metadata"
-	"github.com/kyleconroy/sqlc/internal/plugin"
+	"github.com/ducesoft/sqlc/internal/metadata"
+	"github.com/ducesoft/sqlc/internal/plugin"
 )
 
 type QueryValue struct {

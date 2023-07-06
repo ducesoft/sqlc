@@ -20,12 +20,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/cobra"
 
-	"github.com/kyleconroy/sqlc/internal/config"
-	"github.com/kyleconroy/sqlc/internal/debug"
-	"github.com/kyleconroy/sqlc/internal/opts"
-	"github.com/kyleconroy/sqlc/internal/plugin"
-	"github.com/kyleconroy/sqlc/internal/shfmt"
-	"github.com/kyleconroy/sqlc/internal/sql/ast"
+	"github.com/ducesoft/sqlc/internal/config"
+	"github.com/ducesoft/sqlc/internal/debug"
+	"github.com/ducesoft/sqlc/internal/opts"
+	"github.com/ducesoft/sqlc/internal/plugin"
+	"github.com/ducesoft/sqlc/internal/shfmt"
+	"github.com/ducesoft/sqlc/internal/sql/ast"
 )
 
 var ErrFailedChecks = errors.New("failed checks")
